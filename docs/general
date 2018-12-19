@@ -1,0 +1,88 @@
+1. Getting TypeScript
+TypeScript itself is simple to add to any project with npm.
+
+npm install -D typescript
+
+
+2. Project Structure
+The most obvious difference in a TypeScript + Node project is the folder structure.
+In a TypeScript project, it's best to have separate source and distributable files.
+TypeScript (.ts) files live in your src folder and after compilation are output as JavaScript (.js) in the dist folder.
+The test and views folders remain top level as expected.
+
+Name                    Description
+.vscode                 Contains VS Code specific settings
+dist                    Contains the distributable (or output) from your TypeScript build. This is the code you ship
+node_modules            Contains all your npm dependencies
+src                     Contains your source code that will be compiled to the dist dir
+src/config              Passport authentication strategies and login middleware. Add other complex config code here
+src/controllers         Controllers define functions that respond to various http requests
+src/models              Models define Mongoose schemas that will be used in storing and retrieving data from MongoDB
+src/public              Static assets that will be used client side
+src/types               Holds .d.ts files not found on DefinitelyTyped. Covered more in this section (https://github.com/Microsoft/TypeScript-Node-Starter#type-definition-dts-files)
+src/server.ts           Entry point to your express app
+test                    Contains your tests. Seperate from source because there is a different build process.
+views                   Views define how your app renders on the client.
+.env.example            API keys, tokens, passwords, database URI. Clone this, but don't check it in to public repos.
+.travis.yml             Used to configure Travis CI build
+.copyStaticAssets.ts    Build script that copies images, fonts, and JS libs to the dist folder
+jest.config.js          Used to configure Jest
+package.json            File that contains npm dependencies as well as build scripts
+tsconfig.json           Config settings for compiling server code written in TypeScript
+tsconfig.tests.json     Config settings for compiling tests written in TypeScript
+tslint.json             Config settings for TSLint code style checking
+
+
+3. Building the project
+It is rare for JavaScript projects not to have some kind of build pipeline these days,
+however Node projects typically have the least amount build configuration.
+Because of this I've tried to keep the build as simple as possible.
+If you're concerned about compile time, the main watch task takes ~2s to refresh.
+
+
+4. Configuring TypeScript compilation
+
+tsconfig.json
+more details: https://www.typescriptlang.org/docs/handbook/compiler-options.html
+
+compilerOptions                 Description
+"module": "commonjs"            The output module type (in your .js files). Node uses commonjs, so that is what we use
+"esModuleInterop": true,        Allows usage of an alternate module import syntax: import foo from 'foo';
+"target": "es6"                 The output language level. Node supports ES6, so we can target that here
+"noImplicitAny": true           Enables a stricter setting which throws errors when something has a default any value
+"moduleResolution": "node"      TypeScript attempts to mimic Node's module resolution strategy. Read more here
+"sourceMap": true               We want source maps to be output along side our JavaScript. See the debugging section
+"outDir": "dist"                Location to output .js files after compilation
+"baseUrl": "."                  Part of configuring module resolution. See path mapping section
+paths: {...}                    Part of configuring module resolution. See path mapping section
+
+The rest of the file define the TypeScript project context.
+"include": [
+  "src/**/*"
+]
+
+"include" takes an array of glob patterns of files to include in the compilation.
+For more complex setups, you can include an "exclude" array of glob patterns that removes specific files from the set defined with "include".
+
+
+5. Running the build
+
+Npm Script	Description
+start                 Does the same as 'npm run serve'. Can be invoked with npm start
+build                 Full build. Runs ALL build tasks (build-sass, build-ts, tslint, copy-static-assets)
+serve                 Runs node on dist/server.js which is the apps entry point
+watch-node            Runs node with nodemon so the process restarts if it crashes. Used in the main watch task
+watch                 Runs all watch tasks (TypeScript, Sass, Node). Use this if you're not touching static assets.
+test                  Runs tests using Jest test runner
+watch-test            Runs tests in watch mode
+build-ts              Compiles all source .ts files to .js files in the dist folder
+watch-ts              Same as build-ts but continuously watches .ts files and re-compiles when needed
+build-sass            Compiles all .scss files to .css files
+watch-sass            Same as build-sass but continuously watches .scss files and re-compiles when needed
+tslint                Runs TSLint on project files
+copy-static-assets    Calls script that copies JS libs, fonts, and images to dist directory
+debug                 Performs a full build and then serves the app in watch mode
+serve-debug           Runs the app with the --inspect flag
+watch-debug           The same as watch but includes the --inspect flag so you can attach a debugger
+
+
